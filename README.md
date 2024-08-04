@@ -37,7 +37,9 @@ git clone https://github.com/percivalyan/pintarkuis.git
 
 ## Setup
 
-```bash cd pintarkuis ```
+```bash 
+cd pintarkuis
+```
 
 ### Backend
 

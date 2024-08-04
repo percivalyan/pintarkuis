@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import fetchQuestions from '../api/quizApi';
 import '../styles/Quiz.css';
 
@@ -6,9 +6,10 @@ const Quiz = ({ onQuizEnd, onReset }) => {
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [score, setScore] = useState(0);
-    const [timer, setTimer] = useState(3); // Timer 5 menit
+    const [timer, setTimer] = useState(10); // Timer 5 minutes (300 seconds)
     const [isQuizEnded, setIsQuizEnded] = useState(false);
     const [startTime, setStartTime] = useState(new Date());
+    const timerRef = useRef();
 
     useEffect(() => {
         const savedState = localStorage.getItem('quizState');
@@ -20,46 +21,42 @@ const Quiz = ({ onQuizEnd, onReset }) => {
             setTimer(timer);
             setStartTime(new Date(startTime));
         } else {
-            const savedQuestions = localStorage.getItem('quizQuestions');
-            if (savedQuestions) {
-                setQuestions(JSON.parse(savedQuestions));
-            } else {
-                const loadQuestions = async () => {
-                    try {
-                        const fetchedQuestions = await fetchQuestions();
-                        if (fetchedQuestions.length > 0) {
-                            const processedQuestions = fetchedQuestions.map(question => {
-                                const answers = [question.correct_answer, ...question.incorrect_answers];
-                                return {
-                                    ...question,
-                                    answers: answers.sort(() => Math.random() - 0.5),
-                                };
-                            });
-                            setQuestions(processedQuestions);
-                            localStorage.setItem('quizQuestions', JSON.stringify(processedQuestions));
-                        } else {
-                            console.error('No questions fetched');
-                        }
-                    } catch (error) {
-                        console.error('Error fetching questions:', error);
-                    }
-                };
-                loadQuestions();
-            }
+            const loadQuestions = async () => {
+                try {
+                    const fetchedQuestions = await fetchQuestions();
+                    const processedQuestions = fetchedQuestions.map(question => {
+                        const answers = [question.correct_answer, ...question.incorrect_answers];
+                        return {
+                            ...question,
+                            answers: answers.sort(() => Math.random() - 0.5),
+                        };
+                    });
+                    setQuestions(processedQuestions);
+                    localStorage.setItem('quizQuestions', JSON.stringify(processedQuestions));
+                } catch (error) {
+                    console.error('Error fetching questions:', error);
+                }
+            };
+            loadQuestions();
         }
     }, []);
 
     useEffect(() => {
+        if (!isQuizEnded) {
+            timerRef.current = setInterval(() => {
+                setTimer(prevTimer => prevTimer - 1);
+            }, 1000);
+        }
+        return () => clearInterval(timerRef.current);
+    }, [isQuizEnded]);
+
+    useEffect(() => {
         if (timer === 0) {
             setIsQuizEnded(true);
-            onQuizEnd(score, currentQuestionIndex - score, currentQuestionIndex, startTime, new Date());
+            onQuizEnd(score, questions.length - score, currentQuestionIndex, startTime, new Date());
             localStorage.removeItem('quizState');
         }
-        const timerId = setInterval(() => {
-            setTimer(prevTimer => prevTimer - 1);
-        }, 1000);
-        return () => clearInterval(timerId);
-    }, [timer, onQuizEnd, score, questions.length, startTime, currentQuestionIndex]);
+    }, [timer, onQuizEnd, score, questions.length, currentQuestionIndex, startTime]);
 
     useEffect(() => {
         if (!isQuizEnded) {
@@ -85,7 +82,6 @@ const Quiz = ({ onQuizEnd, onReset }) => {
             setIsQuizEnded(true);
             onQuizEnd(score, questions.length - score, questions.length, startTime, new Date());
             localStorage.removeItem('quizState');
-            localStorage.removeItem('quizQuestions'); // Clear saved questions after quiz ends
         }
     };
 
@@ -109,7 +105,7 @@ const Quiz = ({ onQuizEnd, onReset }) => {
     return (
         <div className="quiz-container">
             <div className="quiz-header">
-                <p className="quiz-timer">Sisa waktu: {Math.floor(timer / 60)}:{timer % 60}</p>
+                <p className="quiz-timer">Sisa waktu: {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}</p>
                 <h3 className="quiz-question">{question}</h3>
                 <button className="reset-button" style={{backgroundColor: 'red'}} onClick={handleReset}>Reset Kuis</button> {/* Tombol Reset */}
             </div>

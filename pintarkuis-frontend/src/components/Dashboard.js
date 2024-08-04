@@ -12,6 +12,11 @@ const Dashboard = () => {
         if (savedHistory) {
             setQuizHistory(JSON.parse(savedHistory));
         }
+
+        const savedQuizState = localStorage.getItem('quizState');
+        if (savedQuizState) {
+            setQuizStarted(true);
+        }
     }, []);
 
     useEffect(() => {
@@ -20,6 +25,7 @@ const Dashboard = () => {
 
     const handleQuizStart = () => {
         localStorage.removeItem('quizState');
+        localStorage.removeItem('quizQuestions');
         setQuizResults(null);
         setQuizStarted(true);
     };
@@ -34,6 +40,8 @@ const Dashboard = () => {
     const handleReset = () => {
         setQuizResults(null);
         setQuizStarted(false);
+        localStorage.removeItem('quizState');
+        localStorage.removeItem('quizQuestions');
     };
 
     const handleDelete = (index) => {
@@ -53,10 +61,8 @@ const Dashboard = () => {
                 <div>
                     <h3>Hasil Kuis</h3>
                     <p>Benar: {quizResults.correct}</p>
-                    <p>Salah: {quizResults.incorrect}</p>
-                    <p>Jumlah Soal: {quizResults.attempted}</p>
-                    <p>Jumlah Jawaban: {quizResults.correct + quizResults.incorrect}</p> {/* Jumlah Jawaban */}
-                    {/* <button onClick={handleReset}>Reset Kuis</button> */}
+                    <p>Salah: {quizResults.attempted - quizResults.correct}</p>
+                    <p>Jumlah Jawaban yang Dijawab: {quizResults.attempted}</p>
                 </div>
             )}
 
@@ -69,7 +75,7 @@ const Dashboard = () => {
                             <th>Skor Benar</th>
                             <th>Skor Salah</th>
                             <th>Jumlah Soal</th>
-                            <th>Jumlah Jawaban</th>
+                            <th>Jumlah Jawaban yang Dijawab</th>
                             <th>Tanggal Mulai</th>
                             <th>Tanggal Selesai</th>
                             <th>Action</th>
@@ -81,9 +87,9 @@ const Dashboard = () => {
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{entry.correct}</td>
-                                    <td>{entry.incorrect}</td>
+                                    <td>{entry.attempted - entry.correct}</td>
                                     <td>15</td>
-                                    <td>{entry.correct + entry.incorrect}</td>
+                                    <td>{entry.attempted}</td>
                                     <td>{new Date(entry.startTime).toLocaleString()}</td>
                                     <td>{new Date(entry.endTime).toLocaleString()}</td>
                                     <td>

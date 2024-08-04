@@ -1,0 +1,99 @@
+/* App.css */
+.app-container {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.navbar {
+  background-color: #4CAF50; /* Warna utama navbar */
+  padding: 1rem 2rem;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Tambahkan bayangan */
+}
+
+.navbar-brand h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.navbar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-menu li {
+  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease; /* Animasi transisi */
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Warna latar belakang saat hover */
+}
+
+.logout-button {
+  background-color: #f44336; /* Warna tombol logout */
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease; /* Animasi transisi */
+}
+
+.logout-button:hover {
+  background-color: #d32f2f;
+}
+
+.username-display {
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  margin-right: 1rem;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f5f5f5; /* Warna latar belakang konten */
+}
+
+/* Responsivitas */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-menu {
+    flex-direction: column;
+    margin-top: 1rem;
+  }
+
+  .navbar-menu li {
+    margin-left: 0;
+    margin-bottom: 0.5rem;
+  }
+}
